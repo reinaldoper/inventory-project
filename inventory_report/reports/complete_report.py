@@ -12,7 +12,6 @@ class CompleteReport(SimpleReport):
         products = ""
         for line in list_empresa:
             products += f"- {line}: {list_empresa[line]}\n"
-
         return (
             f"{super().generate(data)}\n"
             f"{list_header}\n"
