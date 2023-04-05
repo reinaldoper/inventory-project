@@ -1,9 +1,9 @@
 from inventory_report.reports.simple_report import SimpleReport
 from inventory_report.reports.complete_report import CompleteReport
-import csv
+from inventory_report.importer.csv_importer import CsvImporter
+from inventory_report.importer.json_importer import JsonImporter
+from inventory_report.importer.xml_importer import XmlImporter
 import os
-import json
-import xmltodict
 
 
 class Inventory:
@@ -11,43 +11,15 @@ class Inventory:
     def import_data(cls, data: str, type: str):
         arquivo, extensao = os.path.splitext(data)
         if extensao == '.csv':
-            header_csv = cls.read_csv(data, type)
-            return header_csv
+            header = CsvImporter().import_data(data)
         if extensao == '.json':
-            header_json = cls.read_json(data, type)
-            return header_json
+            header = JsonImporter().import_data(data)
         if extensao == '.xml':
-            headre_xml = cls.read_xml(data)
-            if type == 'simples':
-                return SimpleReport().generate(headre_xml)
-            else:
-                return CompleteReport().generate(headre_xml)
+            header = XmlImporter().import_data(data)
+        return cls.read_arq(header, type)
 
-    def read_csv(arq_csv, type):
-        array = []
-        with open(arq_csv, 'r') as file:
-            file_csv = csv.DictReader(file)
-            for line in file_csv:
-                array.append(line)
+    def read_arq(arq: str, type: str):
         if type == 'simples':
-            new_data = SimpleReport().generate(array)
-            return new_data
-        if type == 'completo':
-            new_data = CompleteReport().generate(array)
-            return new_data
-
-    def read_json(arq_json, type):
-        with open(arq_json) as file:
-            content = file.read()  # leitura do arquivo
-            header_json = json.loads(content)
-        if type == 'simples':
-            new_data = SimpleReport().generate(header_json)
-            return new_data
-        if type == 'completo':
-            new_data = CompleteReport().generate(header_json)
-            return new_data
-
-    def read_xml(arq_xml):
-        with open(arq_xml, "r") as file:
-            data_xml = xmltodict.parse(file.read())
-            return data_xml["dataset"]["record"]
+            return SimpleReport().generate(arq)
+        else:
+            return CompleteReport().generate(arq)
