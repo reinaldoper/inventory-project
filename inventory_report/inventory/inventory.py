@@ -9,7 +9,7 @@ import os
 class Inventory:
     @classmethod
     def import_data(cls, data: str, type: str):
-        arquivo, extensao = os.path.splitext(data)
+        _arquivo, extensao = os.path.splitext(data)
         if extensao == '.csv':
             header = CsvImporter().import_data(data)
         if extensao == '.json':
